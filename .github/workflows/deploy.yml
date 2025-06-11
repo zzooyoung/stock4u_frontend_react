@@ -3,7 +3,7 @@ name: React CI/CD with Serve
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-deploy:
