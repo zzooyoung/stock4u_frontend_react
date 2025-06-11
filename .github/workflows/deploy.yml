@@ -1,10 +1,36 @@
+name: React CI/CD with Serve
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 코드 가져오기
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Node.js 설치
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: 📦 의존성 설치
+        run: npm install
+
+      - name: 🛠️ 빌드 실행
+        run: CI=false npm run build
+
       - name: 📤 서버에 파일 복사 (build/)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "build"            # ⬅️ 디렉토리 전체 복사
+          source: "build"
           target: "/stock4u/react-app"
 
       - name: 🚀 서버에서 serve로 실행
@@ -17,11 +43,15 @@
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 22
-
+            
+            # pm2 설치 (처음 한 번만 실행됨)
             if ! command -v pm2 &> /dev/null; then
+              echo "🔧 pm2 not found, installing..."
               npm install -g pm2
+            else
+              echo "✅ pm2 already installed"
             fi
 
             pm2 delete react-app || true
-            pm2 start serve --name "react-app" -- -s /stock4u/react-app/build -l 3000
+            pm2 start serve --name "react-app" -- -s /stock4u/react-app -l 3000
             pm2 save
