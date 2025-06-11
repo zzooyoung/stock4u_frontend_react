@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "build/*"
-          target: "/home/${{ secrets.SSH_USER }}/react-app"
+          target: "/stock4u/react-app"
 
       - name: 🚀 서버에서 serve로 실행
         uses: appleboy/ssh-action@v0.1.10
