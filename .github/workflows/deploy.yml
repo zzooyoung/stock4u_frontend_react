@@ -53,5 +53,5 @@ jobs:
             fi
 
             pm2 delete react-app || true
-            pm2 start serve --name "react-app" -- -s /stock4u/react-app/build -l 3000
+            pm2 start serve --name "react-app" -- -s /stock4u/react-app/build -l 13000
             pm2 save
