@@ -1,9 +1,13 @@
-import { FaArrowUp, FaArrowDown } from "react-icons/fa"
 import StockChart from "./StockChart"
 
 function StockCard({ stock }) {
-  const { symbol, name, currentPrice, change, changePercent, prediction, data } = stock
+  const { symbol, data, prediction } = stock
 
+  const latest = data[data.length - 1]
+  const open = latest?.open || 0
+  const close = latest?.close || 0
+  const change = close - open
+  const changePercent = open !== 0 ? (change / open) * 100 : 0
   const isPositive = change >= 0
 
   return (
@@ -11,42 +15,47 @@ function StockCard({ stock }) {
       <div className="stock-card-header">
         <div className="stock-info">
           <h3 className="stock-symbol">{symbol}</h3>
-          <p className="stock-name">{name}</p>
         </div>
         <div className="stock-price">
-          <div className="current-price">${currentPrice.toFixed(2)}</div>
+          <div className="current-price">${close.toFixed(2)}</div>
           <div className={`price-change ${isPositive ? "positive" : "negative"}`}>
-            {isPositive ? <FaArrowUp className="arrow-icon" /> : <FaArrowDown className="arrow-icon" />}
-            <span>
-              {isPositive ? "+" : ""}
-              {change.toFixed(2)} ({changePercent.toFixed(2)}%)
-            </span>
+            {isPositive ? "▲" : "▼"} {change.toFixed(2)} ({changePercent.toFixed(2)}%)
           </div>
         </div>
       </div>
+
       <div className="stock-chart-container">
         <StockChart data={data} />
       </div>
-      <div className="prediction-container">
-        <h4 className="prediction-title">Tomorrow's Prediction</h4>
-        <div className="prediction-values">
-          <div className="prediction-item">
-            <span className="prediction-label">Close</span>
-            <span className="prediction-value">${prediction.close.toFixed(2)}</span>
-          </div>
-          <div className="prediction-item">
-            <span className="prediction-label">High</span>
-            <span className="prediction-value">${prediction.high.toFixed(2)}</span>
-          </div>
-          <div className="prediction-item">
-            <span className="prediction-label">Low</span>
-            <span className="prediction-value">${prediction.low.toFixed(2)}</span>
+
+      {/* ✅ 예측값 출력 - 숫자 변환 및 존재 여부 체크 */}
+      {prediction && (
+        <div className="prediction-container">
+          <h4 className="prediction-title">📊 Tomorrow's Prediction</h4>
+          <div className="prediction-values">
+            <div className="prediction-item">
+              <span className="prediction-label">Close</span>
+              <span className="prediction-value">
+                ${Number(prediction.predicted_close || 0).toFixed(2)}
+              </span>
+            </div>
+            <div className="prediction-item">
+              <span className="prediction-label">High</span>
+              <span className="prediction-value">
+                ${Number(prediction.predicted_high || 0).toFixed(2)}
+              </span>
+            </div>
+            <div className="prediction-item">
+              <span className="prediction-label">Low</span>
+              <span className="prediction-value">
+                ${Number(prediction.predicted_low || 0).toFixed(2)}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
 export default StockCard
-
