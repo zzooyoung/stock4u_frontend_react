@@ -8,7 +8,7 @@ function StockListContainer() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:15000/stock-data", {
+        const response = await fetch("http://211.254.215.47:45000/stock-data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tickers: ["AAPL", "NVDA", "AMZN"] }),
@@ -16,7 +16,7 @@ function StockListContainer() {
 
         const stockData = await response.json()
 
-        const predictionResponse = await fetch("http://localhost:15000/predict", {
+        const predictionResponse = await fetch("http://211.254.215.47:45000/predict", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tickers: ["AAPL", "NVDA", "AMZN"] }),
