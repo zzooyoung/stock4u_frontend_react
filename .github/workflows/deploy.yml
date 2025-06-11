@@ -1,0 +1,49 @@
+name: Deploy React App
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Build React App
+      run: |
+        npm install
+        npm run build
+
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          pkill -f "serve" || true
+          rm -rf ~/react-app/*
+          mkdir -p ~/react-app
+          exit 0
+
+    - name: Copy Build Files to Server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        source: build/*
+        target: react-app
+
+    - name: Run Serve on Server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          nohup serve -s ~/react-app -l 3000 > serve.log 2>&1 &
+          echo "✅ React 앱이 3000번 포트에서 serve 중입니다."
