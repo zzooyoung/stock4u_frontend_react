@@ -40,6 +40,14 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            # pm2 설치 (처음 한 번만 실행됨)
+            if ! command -v pm2 &> /dev/null; then
+              echo "🔧 pm2 not found, installing..."
+              npm install -g pm2
+            else
+              echo "✅ pm2 already installed"
+            fi
+            
             pm2 delete react-app || true
             pm2 start serve --name "react-app" -- -s /stock4u/react-app -l 3000
             pm2 save
